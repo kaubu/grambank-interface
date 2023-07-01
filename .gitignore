@@ -1,6 +1,6 @@
 # My additions
 ## CSV lock
-.~lock.values.csv#
+.~lock.*.csv#
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

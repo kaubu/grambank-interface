@@ -38,6 +38,8 @@ from codes import codes
 import csv
 import sys
 
+# import pandas as pd
+
 maxInt = sys.maxsize
 
 # Quick and dirty code
@@ -51,19 +53,50 @@ while True:
     except OverflowError:
         maxInt = int(maxInt/10)
 
-GRAMBANK_VALUES = "./values2.csv"
+GRAMBANK_VALUES = "./values3.csv"
 
 DEFAULT_SORT = languages.west_germanic
+
+def print_results(result):
+    """ 
+    languages_result = {
+        "icel1247": {
+            "language_name": "Icelandic",
+            "code_value": 1,
+            "code_description": "present",
+            "comment": "…"
+        },
+    }
+    """
+
+    print("==[Detailed]==")
+    for lang, metadata in result.items():
+        print(
+            f"{metadata['language_name']}: '{metadata['code_description']}'"
+        )
+        if metadata["comment"].strip() != "":
+            print(f"  - {metadata['comment']}")
 
 while True:
     parameter_id_input = input("Enter Parameter ID (e.g. GB020): ")
     print("Searching…")
 
-    languages = {}
+    languages_result = {}
 
     """ 
-    languages = {
-        "icel1247": "1",
+    languages_result = {
+        "META": {
+            "frequency": {
+                42: {"absent"},
+                1: {"present"},
+            }
+        }
+        "icel1247": {
+            "language_name": "Icelandic",
+            "code_value": 1,
+            "code_description": "present",
+            "comment": "…"
+        },
     }
     """
     
@@ -75,7 +108,7 @@ while True:
     ) as csvfile:
         csvreader = csv.reader(
             csvfile,
-            delimiter = ",",
+            delimiter = "\t",
             quotechar = "|",
             # dialect=csv.excel_tab
         )
@@ -103,17 +136,17 @@ while True:
                                         numeral two.
             """
 
-            # If there there are less than 9 columns and there was previously
-            # a 
-            if len(row) < 9 and not is_newline:
-                newline_buffer = row
-                is_newline = True
-                continue
-            elif len(row) < 9 and is_newline:
-                newline_buffer += row
-                continue
+            # Check if there are newlines and fix it
+            if len(row) < 9:
+                if is_newline:
+                    newline_buffer += [r.strip() for r in row]
+                    continue
+                else:
+                    newline_buffer = [r.strip() for r in row]
+                    is_newline = True
+                    continue
             elif len(row) == 9 and is_newline:
-                row = newline_buffer + row
+                row = newline_buffer + [r.strip() for r in row]
                 is_newline = False
                 newline_buffer = []
 
@@ -121,12 +154,21 @@ while True:
             parameter_id = row[2]
             value = row[3]
             code_id = row[4]
+            comment = row[5]
 
             # If the language matches the section we're on
-            if language_id in DEFAULT_SORT:
+            if language_id in DEFAULT_SORT.keys():
                 if parameter_id == parameter_id_input:
-                    languages[language_id] = codes[code_id]
+                    languages_result[language_id] = {
+                        "language_name": DEFAULT_SORT[language_id]["name"],
+                        "code_value": value,
+                        "code_description": codes[code_id],
+                        "comment": comment,
+                    }
     
     print("Finished.")
-    print(f"\n[Languages]\n{languages}\n")
-    languages = {}
+    # print(f"\n[Languages]\n{languages}\n")
+    print_results(languages_result)
+    print()
+
+    languages_result = {}
