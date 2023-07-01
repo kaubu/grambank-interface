@@ -56,7 +56,8 @@ GRAMBANK_VALUES = "./values2.csv"
 DEFAULT_SORT = languages.west_germanic
 
 while True:
-    parameter_id_input = input("Enter Parameter ID: ")
+    parameter_id_input = input("Enter Parameter ID (e.g. GB020): ")
+    print("Searching…")
 
     languages = {}
 
@@ -69,21 +70,24 @@ while True:
     with open(
         GRAMBANK_VALUES,
         mode="r",
-        # newline="\r\n",
+        newline="",
         encoding="utf8"
     ) as csvfile:
         csvreader = csv.reader(
             csvfile,
             delimiter = ",",
             quotechar = "|",
-            dialect=csv.excel_tab
+            # dialect=csv.excel_tab
         )
+
+        is_newline = False
+        newline_buffer = []
 
         for i, row in enumerate(csvreader):
             # If it is the column title row
             if i == 0: continue
 
-            print(f"row = {row}")
+            # print(f"row = {row}")
 
             # row = row[0].split(",")
 
@@ -99,6 +103,20 @@ while True:
                                         numeral two.
             """
 
+            # If there there are less than 9 columns and there was previously
+            # a 
+            if len(row) < 9 and not is_newline:
+                newline_buffer = row
+                is_newline = True
+                continue
+            elif len(row) < 9 and is_newline:
+                newline_buffer += row
+                continue
+            elif len(row) == 9 and is_newline:
+                row = newline_buffer + row
+                is_newline = False
+                newline_buffer = []
+
             language_id = row[1]
             parameter_id = row[2]
             value = row[3]
@@ -108,5 +126,7 @@ while True:
             if language_id in DEFAULT_SORT:
                 if parameter_id == parameter_id_input:
                     languages[language_id] = codes[code_id]
-
-print(f"[Languages]\n{languages}\n")
+    
+    print("Finished.")
+    print(f"\n[Languages]\n{languages}\n")
+    languages = {}
