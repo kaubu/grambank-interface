@@ -57,7 +57,57 @@ while True:
 GRAMBANK_VALUES = "./values3.csv"
 
 # DEFAULT_SORT = languages.test
-DEFAULT_SORT = language_families["Indo-European"]
+# DEFAULT_SORT = language_families["Indo-European"]
+DEFAULT_SORT = languages.living_indo_european
+
+# Sort by keys in descending order
+def sort_by_keys(dictionary):
+    return dict(sorted(dictionary.items(), key=lambda x:x[1], reverse=True))
+
+def calculate_weights(result) -> (dict, dict):
+    """ 
+    native_weights = {
+        "present": 48.24,
+        "absent": 23.41,
+        "unknown": 45,
+    }
+    """
+
+    native_weights = {}
+    total_weights = {}
+
+    for lang, metadata in result.items():
+        code_description = metadata["code_description"]
+
+        if code_description in native_weights:
+            native_weights[code_description] += metadata["native_weight"]
+        else:
+            native_weights[code_description] = metadata["native_weight"]
+        
+        if code_description in total_weights:
+            total_weights[code_description] += metadata["total_weight"]
+        else:
+            total_weights[code_description] = metadata["total_weight"]
+    
+    native_weights = sort_by_keys(native_weights)
+    total_weights = sort_by_keys(total_weights)
+
+    return (native_weights, total_weights)
+
+def calculate_frequency(result) -> dict:
+    frequency = {}
+
+    for lang, metadata in result.items():
+        code_description = metadata["code_description"]
+
+        if code_description in frequency:
+            frequency[code_description] += 1
+        else:
+            frequency[code_description] = 1
+    
+    frequency = sort_by_keys(frequency)
+    
+    return frequency
 
 def print_results(result):
     """ 
@@ -66,10 +116,30 @@ def print_results(result):
             "language_name": "Icelandic",
             "code_value": 1,
             "code_description": "present",
-            "comment": "…"
+            "comment": "…",
+            "native_weight": 0.12,
+            "total_weight": 0.9
         },
     }
     """
+
+    print("==[Overview]==")
+    native_weights, total_weights = calculate_weights(result)
+    # print(f"native_weights = {native_weights}")
+    # print(f"total_weights = {total_weights}")
+
+    print("[Native Speakers]")
+    for weight_name, weight_value in native_weights.items():
+        print(f"* {weight_name}: {weight_value}% of speakers")
+
+    print("[Total Speakers]")
+    for weight_name, weight_value in total_weights.items():
+        print(f"* {weight_name}: {weight_value}% of speakers")
+    
+    print("[Frequency by Language]")
+    frequency = calculate_frequency(result)
+    for code, frequency_value in frequency.items():
+        print(f"* {code}: {frequency_value}")
 
     print("==[Detailed]==")
     for lang, metadata in result.items():
@@ -80,6 +150,8 @@ def print_results(result):
             print(f"  - {metadata['comment']}\n")
 
 while True:
+    print("================================================================")
+
     parameter_id_input = input("Enter Parameter ID (e.g. GB020): ")
     print("Searching…")
 
@@ -87,12 +159,6 @@ while True:
 
     """ 
     languages_result = {
-        "META": {
-            "frequency": {
-                42: {"absent"},
-                1: {"present"},
-            }
-        }
         "icel1247": {
             "language_name": "Icelandic",
             "code_value": 1,
@@ -175,6 +241,10 @@ while True:
                         "code_value": value,
                         "code_description": codes[code_id],
                         "comment": comment,
+                        "native_weight": 
+                            DEFAULT_SORT[language_id]["native_weight"],
+                        "total_weight":
+                            DEFAULT_SORT[language_id]["total_weight"],
                     }
     
     print("Finished.")

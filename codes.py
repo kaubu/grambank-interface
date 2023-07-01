@@ -1,5 +1,5 @@
 codes = {
-    "UNKNOWN": "Unknown. Check comments for more information.",
+    "UNKNOWN": "unknown/empty/not applicable",
     "GB020-0": "absent",
     "GB020-1": "present",
     "GB021-0": "absent",
