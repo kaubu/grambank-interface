@@ -60,6 +60,12 @@ hellenic = {
     },
 }
 
+test = {
+    "cent2127": {
+        "name": "Central Alaskan Yupik",
+    }
+}
+
 living_indo_european = {
     "mode1248": {
         "name": "Modern Greek",

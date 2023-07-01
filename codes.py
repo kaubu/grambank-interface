@@ -1,4 +1,5 @@
 codes = {
+    "UNKNOWN": "Unknown. Check comments for more information.",
     "GB020-0": "absent",
     "GB020-1": "present",
     "GB021-0": "absent",

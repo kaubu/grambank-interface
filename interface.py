@@ -55,7 +55,7 @@ while True:
 
 GRAMBANK_VALUES = "./values3.csv"
 
-DEFAULT_SORT = languages.west_germanic
+DEFAULT_SORT = languages.test
 
 def print_results(result):
     """ 
@@ -75,7 +75,7 @@ def print_results(result):
             f"{metadata['language_name']}: '{metadata['code_description']}'"
         )
         if metadata["comment"].strip() != "":
-            print(f"  - {metadata['comment']}")
+            print(f"  - {metadata['comment']}\n")
 
 while True:
     parameter_id_input = input("Enter Parameter ID (e.g. GB020): ")
@@ -110,7 +110,6 @@ while True:
             csvfile,
             delimiter = "\t",
             quotechar = "|",
-            # dialect=csv.excel_tab
         )
 
         is_newline = False
@@ -159,6 +158,16 @@ while True:
             # If the language matches the section we're on
             if language_id in DEFAULT_SORT.keys():
                 if parameter_id == parameter_id_input:
+                    
+                    # print(f"row = ===\n{row}\n===")
+                    # print(f"row[1] = Language_ID = {row[1]}")
+                    # print(f"row[2] = Parameter_ID = {row[2]}")
+                    # print(f"row[3] = Value = {row[3]}")
+                    # print(f"row[4] = Code_ID = {row[4]}")
+                    # print(f"row[5] = Comment = {row[5]}")
+
+                    if code_id not in codes: code_id = "UNKNOWN"
+
                     languages_result[language_id] = {
                         "language_name": DEFAULT_SORT[language_id]["name"],
                         "code_value": value,
