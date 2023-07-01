@@ -34,6 +34,7 @@ row[3] = Description        absent
 
 import languages
 from codes import codes
+from language_families import language_families
 
 import csv
 import sys
@@ -55,7 +56,8 @@ while True:
 
 GRAMBANK_VALUES = "./values3.csv"
 
-DEFAULT_SORT = languages.test
+# DEFAULT_SORT = languages.test
+DEFAULT_SORT = language_families["Indo-European"]
 
 def print_results(result):
     """ 
